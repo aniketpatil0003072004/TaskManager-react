@@ -37,128 +37,141 @@ const auth = getAuth(app)
 const db = getFirestore(app)
 
 function Login() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, username, password)
-      navigate('/')
+      await signInWithEmailAndPassword(auth, username, password);
+      navigate('/');
     } catch (error) {
-      setError('Failed to login. Please check your credentials.')
+      setError('Failed to login. Please check your credentials.');
     }
-  }
+  };
 
   return (
-    <div className='flex flex-col h-screen items-center justify-center w-screen'>
-    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-200 rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div>
-          <label className="block mb-1">Username</label>
-          <input
-            type="email"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-        <button type="submit" className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600">
-          Login
-        </button>
-      </form>
-      <p className="mt-4 text-center">
-        Don't have an account? <Link to="/register" className="text-red-500">Register</Link>
-      </p>
+    <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
+      <div className="p-12 bg-white rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-4xl font-bold mb-8 text-center text-gray-700">Login</h1>
+        {error && <p className="text-red-500 mb-6 text-center">{error}</p>}
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div>
+            <label className="block text-lg font-medium mb-2 text-gray-600">Username</label>
+            <input
+              type="email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-lg"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium mb-2 text-gray-600">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-lg"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-4 bg-green-500 text-white text-xl font-bold rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300"
+          >
+            Login
+          </button>
+        </form>
+        <p className="mt-6 text-center text-lg">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-blue-500 hover:underline">
+            Register
+          </Link>
+        </p>
+      </div>
     </div>
-    </div>
-  )
+  );
 }
+
 
 function Register() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError('Passwords do not match');
+      return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, username, password)
-      navigate('/')
+      await createUserWithEmailAndPassword(auth, username, password);
+      navigate('/');
     } catch (error) {
-      setError('Failed to create account')
+      setError('Failed to create account');
     }
-  }
+  };
 
   return (
-    <div className='flex flex-col h-screen items-center justify-center w-screen'>
-
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg">
-      <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <form onSubmit={handleRegister} className="space-y-4">
-        <div>
-          <label className="block mb-1">Username</label>
-          <input
-            type="email"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
+    <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
+      <div className="p-12 bg-white rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-4xl font-bold mb-8 text-center text-gray-700">Create Account</h1>
+        {error && <p className="text-red-500 mb-6 text-center">{error}</p>}
+        <form onSubmit={handleRegister} className="space-y-6">
+          <div>
+            <label className="block text-lg font-medium mb-2 text-gray-600">Username</label>
+            <input
+              type="email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
-        </div>
-        <div>
-          <label className="block mb-1">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
+          </div>
+          <div>
+            <label className="block text-lg font-medium mb-2 text-gray-600">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
-        </div>
-        <div>
-          <label className="block mb-1">Confirm Password</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
+          </div>
+          <div>
+            <label className="block text-lg font-medium mb-2 text-gray-600">Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
-        </div>
-        <button type="submit" className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600">
-          Register
-        </button>
-      </form>
-      <p className="mt-4 text-center">
-        Already have an account? <Link to="/login" className="text-red-500">Login</Link>
-      </p>
+          </div>
+          <button
+            type="submit"
+            className="w-full py-4 bg-green-500 text-white text-xl font-bold rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300"
+          >
+            Register
+          </button>
+        </form>
+        <p className="mt-6 text-center text-lg">
+          Already have an account?{' '}
+          <Link to="/login" className="text-blue-500 hover:underline">
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
-</div>
-  )
+  );
 }
+
 
 function Navigation() {
   const navigate = useNavigate()
