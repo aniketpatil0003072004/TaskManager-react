@@ -53,7 +53,8 @@ function Login() {
   }
 
   return (
-    <div className="max-w-md  mx-auto mt-[8rem] p-6 bg-gray-200 rounded-lg">
+    <div className='flex flex-col h-screen items-center justify-center w-screen'>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-200 rounded-lg">
       <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleLogin} className="space-y-4">
@@ -85,6 +86,7 @@ function Login() {
         Don't have an account? <Link to="/register" className="text-red-500">Register</Link>
       </p>
     </div>
+    </div>
   )
 }
 
@@ -110,7 +112,9 @@ function Register() {
   }
 
   return (
-    <div className="max-w-md h-[100vh]  mx-auto mt-[6rem]  p-6 bg-white rounded-lg">
+    <div className='flex flex-col h-screen items-center justify-center w-screen'>
+
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg">
       <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleRegister} className="space-y-4">
@@ -122,7 +126,7 @@ function Register() {
             onChange={(e) => setUsername(e.target.value)}
             className="w-full p-2 border rounded"
             required
-          />
+            />
         </div>
         <div>
           <label className="block mb-1">Password</label>
@@ -132,7 +136,7 @@ function Register() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border rounded"
             required
-          />
+            />
         </div>
         <div>
           <label className="block mb-1">Confirm Password</label>
@@ -142,7 +146,7 @@ function Register() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full p-2 border rounded"
             required
-          />
+            />
         </div>
         <button type="submit" className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600">
           Register
@@ -152,12 +156,13 @@ function Register() {
         Already have an account? <Link to="/login" className="text-red-500">Login</Link>
       </p>
     </div>
+</div>
   )
 }
 
 function Navigation() {
   const navigate = useNavigate()
-
+  
   const handleLogout = async () => {
     await signOut(auth)
     navigate('/login')
