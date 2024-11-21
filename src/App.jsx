@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { createBrowserRouter, BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate, RouterProvider } from 'react-router-dom'
 import { initializeApp } from 'firebase/app'
