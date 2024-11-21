@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom'
+import {createBrowserRouter, BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate, RouterProvider } from 'react-router-dom'
 import { initializeApp } from 'firebase/app'
 import { 
   getAuth, 
@@ -48,7 +48,7 @@ function Login() {
     e.preventDefault()
     try {
       await signInWithEmailAndPassword(auth, username, password)
-      navigate('/home')
+      navigate('/')
     } catch (error) {
       setError('Failed to login. Please check your credentials.')
     }
@@ -106,7 +106,7 @@ function Register() {
     }
     try {
       await createUserWithEmailAndPassword(auth, username, password)
-      navigate('/home')
+      navigate('/')
     } catch (error) {
       setError('Failed to create account')
     }
@@ -169,7 +169,7 @@ function Navigation() {
 
   return (
     <nav className="flex justify-center gap-4 mb-8">
-      <Link to="/home" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+      <Link to="/" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
         Home
       </Link>
       <Link to="/todo" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
@@ -493,37 +493,14 @@ function ProtectedRoute({ children }) {
 
 
 export default function App() {
+  const router = createBrowserRouter([
+    {path:"/login",element:<Login/>},
+    {path:"/register",element:<Register/>},
+    {path:"/",element:<ProtectedRoute><Home/></ProtectedRoute>},
+    {path:"/todo",element:<ProtectedRoute><TodoList/></ProtectedRoute>},
+    {path:"/calender",element:<ProtectedRoute><Calendar/></ProtectedRoute>},
+  ])
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/todo"
-          element={
-            <ProtectedRoute>
-              <TodoList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/calendar"
-          element={
-            <ProtectedRoute>
-              <Calendar />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/" element={<Navigate to="/login" />} />
-      </Routes>
-    </Router>
+    <RouterProvider router={router}/>
   )
 }
