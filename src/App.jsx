@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {createBrowserRouter, BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate, RouterProvider } from 'react-router-dom'
 import { initializeApp } from 'firebase/app'
 import { 
   getAuth, 
@@ -21,7 +21,7 @@ import {
   query,
   where
 } from 'firebase/firestore'
-
+import { LoadingSpinner } from './components/LoadingSpinner'
 
 const firebaseConfig = {
   apiKey: "AIzaSyBEu8-1_hPMkBO7u0iOLRfCOhDc1Di2Tls",
@@ -32,11 +32,9 @@ const firebaseConfig = {
   appId: "1:40697294895:web:5019b222cd4f047566d6da"
 };
 
-
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
 const db = getFirestore(app)
-
 
 function Login() {
   const [username, setUsername] = useState('')
@@ -89,7 +87,6 @@ function Login() {
     </div>
   )
 }
-
 
 function Register() {
   const [username, setUsername] = useState('')
@@ -158,7 +155,6 @@ function Register() {
   )
 }
 
-
 function Navigation() {
   const navigate = useNavigate()
 
@@ -168,7 +164,7 @@ function Navigation() {
   }
 
   return (
-    <nav className="flex justify-center gap-4 mb-8">
+    <nav className="flex flex-wrap justify-center gap-4 mb-8">
       <Link to="/" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
         Home
       </Link>
@@ -188,14 +184,15 @@ function Navigation() {
   )
 }
 
-
 function Home() {
+  
+
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Welcome to Your To-Do List</h1>
+      <h1 className="text-xl sm:text-3xl font-bold text-center mb-8">Welcome to Your To-Do List</h1>
       <Navigation />
-      <h2 className="text-2xl font-bold mb-4">About the Website</h2>
-      <div className="space-y-4">
+      <h2 className="text-lg sm:text-2xl font-bold mb-4">About the Website</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="p-4 bg-gray-100 rounded">
           Organize Your Day, One Task at a Time!
         </div>
@@ -219,12 +216,68 @@ function Home() {
   )
 }
 
-
 function TodoList() {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [dueTime, setDueTime] = useState('')
+  const scheduledTaskIds = new Set();
+
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+        } else {
+          console.log('Notification permission denied.');
+        }
+      });
+    }
+  }, []);
+
+  const scheduleNotification = (task) => {
+    // Ensure dueDate is in a valid format for Date parsing
+    const now = new Date().getTime();
+    const taskTime = new Date(task.dueDate).getTime();
+  
+    console.log('Current Time:', now);
+    console.log('Task Time:', taskTime);
+  
+    if (!isNaN(taskTime) && taskTime > now) {
+      const delay = taskTime - now; // Calculate delay in milliseconds
+      console.log('Delay (ms):', delay);
+  
+      setTimeout(() => {
+        console.log('Notification triggered');
+        if (Notification.permission === 'granted') {
+          new Notification('Task Reminder', {
+            body: `Reminder: ${task.title} is due at ${new Date(task.dueDate).toLocaleTimeString()}`,
+            icon: '/icon.png', // Optional: path to an icon for the notification
+          });
+        }
+      }, delay);
+    } else {
+      console.error('Invalid task time or task is already past due.');
+    }
+  };
+  
+
+console.log(scheduledTaskIds);
+
+  
+  
+
+
+  useEffect(() => {
+    tasks.forEach(task => {
+      if (!scheduledTaskIds.has(task.id)) {
+        scheduleNotification(task);
+        scheduledTaskIds.add(task.id);
+      }
+    });
+  }, [tasks]);
+  
+  
 
   useEffect(() => {
     loadTasks()
@@ -286,10 +339,10 @@ function TodoList() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Welcome to Your To-Do List</h1>
+      <h1 className="text-xl sm:text-3xl font-bold text-center mb-8">Welcome to Your To-Do List</h1>
       <Navigation />
-      <h2 className="text-2xl font-bold mb-4">To-Do List</h2>
-      <form onSubmit={addTask} className="flex gap-4 mb-8">
+      <h2 className="text-lg sm:text-2xl font-bold mb-4">To-Do List</h2>
+      <form onSubmit={addTask} className="flex flex-col sm:flex-row gap-4 mb-8">
         <input
           type="text"
           value={newTask}
@@ -318,8 +371,8 @@ function TodoList() {
       </form>
       <div className="space-y-4">
         {tasks.map(task => (
-          <div key={task.id} className="flex items-center justify-between p-4 bg-gray-100 rounded">
-            <div className="flex items-center gap-4">
+          <div key={task.id} className="flex flex-col sm:flex-row items-center justify-between p-4 bg-gray-100 rounded">
+            <div className="flex items-center gap-4 mb-2 sm:mb-0">
               <input
                 type="checkbox"
                 checked={task.completed}
@@ -342,7 +395,6 @@ function TodoList() {
     </div>
   )
 }
-
 
 function Calendar() {
   const [tasks, setTasks] = useState([])
@@ -380,88 +432,65 @@ function Calendar() {
   const renderCalendar = () => {
     const daysInMonth = getDaysInMonth(currentDate)
     const firstDay = getFirstDayOfMonth(currentDate)
-    const days = []
 
+    const days = []
     for (let i = 0; i < firstDay; i++) {
-      days.push(<td key={`empty-${i}`} className="p-4 border"></td>)
+      days.push(<div key={`empty-${i}`} className="h-16 border"></div>)
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
       const dayTasks = tasks.filter(task => {
         const taskDate = new Date(task.dueDate)
-        return (
-          taskDate.getFullYear() === date.getFullYear() &&
-          taskDate.getMonth() === date.getMonth() &&
-          taskDate.getDate() === date.getDate()
-        )
+        return taskDate.toDateString() === date.toDateString()
       })
 
       days.push(
-        <td key={day} className="p-4 border">
+        <div key={day} className="h-16 border p-1">
           <div className="font-bold">{day}</div>
           {dayTasks.map(task => (
-            <div key={task.id} className="text-sm text-blue-600">
-              {new Date(task.dueDate).toLocaleTimeString()} {task.title}
+            <div key={task.id} className="text-sm bg-green-100 rounded px-1 my-1">
+              {task.title}
             </div>
           ))}
-        </td>
+        </div>
       )
     }
 
- 
-    const weeks = []
-    let week = []
-    for (let i = 0; i < days.length; i++) {
-      week.push(days[i])
-      if (week.length === 7) {
-        weeks.push(<tr key={`week-${i}`}>{week}</tr>)
-        week = []
-      }
-    }
-    if (week.length > 0) {
-      weeks.push(<tr key="last-week">{week}</tr>)
-    }
-
-    return weeks
+    return days
   }
 
-  const previousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))
-  }
-
-  const nextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))
+  const changeMonth = (offset) => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + offset, 1))
   }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Welcome to Your To-Do List</h1>
+      <h1 className="text-xl sm:text-3xl font-bold text-center mb-8">Your Calendar</h1>
       <Navigation />
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Calendar</h2>
-        <div className="flex gap-4 items-center">
-          <button onClick={previousMonth} className="px-4 py-2 bg-gray-200 rounded">&lt;</button>
-          <span className="font-bold">
-            {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-          </span>
-          <button onClick={nextMonth} className="px-4 py-2 bg-gray-200 rounded">&gt;</button>
-        </div>
+        <button
+          onClick={() => changeMonth(-1)}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Previous
+        </button>
+        <h2 className="text-lg font-bold">
+          {currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}
+        </h2>
+        <button
+          onClick={() => changeMonth(1)}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Next
+        </button>
       </div>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr>
-            <th className="p-4 border">Sun</th>
-            <th className="p-4 border">Mon</th>
-            <th className="p-4 border">Tue</th>
-            <th className="p-4 border">Wed</th>
-            <th className="p-4 border">Thu</th>
-            <th className="p-4 border">Fri</th>
-            <th className="p-4 border">Sat</th>
-          </tr>
-        </thead>
-        <tbody>{renderCalendar()}</tbody>
-      </table>
+      <div className="grid grid-cols-7 gap-2">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          <div key={day} className="font-bold text-center">{day}</div>
+        ))}
+        {renderCalendar()}
+      </div>
     </div>
   )
 }
@@ -485,12 +514,15 @@ function ProtectedRoute({ children }) {
   }, [navigate])
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className="flex h-[100vh] justify-center flex-col items-center">
+        <LoadingSpinner />
+      </div>
+    )
   }
 
   return user ? <>{children}</> : null
 }
-
 
 export default function App() {
   const router = createBrowserRouter([
@@ -498,9 +530,10 @@ export default function App() {
     {path:"/register",element:<Register/>},
     {path:"/",element:<ProtectedRoute><Home/></ProtectedRoute>},
     {path:"/todo",element:<ProtectedRoute><TodoList/></ProtectedRoute>},
-    {path:"/calender",element:<ProtectedRoute><Calendar/></ProtectedRoute>},
+    {path:"/calendar",element:<ProtectedRoute><Calendar/></ProtectedRoute>},
   ])
   return (
     <RouterProvider router={router}/>
   )
 }
+
