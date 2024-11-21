@@ -53,7 +53,7 @@ function Login() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-200 rounded-lg">
+    <div className="max-w-md  mx-auto mt-[8rem] p-6 bg-gray-200 rounded-lg">
       <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleLogin} className="space-y-4">
@@ -110,7 +110,7 @@ function Register() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg">
+    <div className="max-w-md h-[100vh]  mx-auto mt-[6rem]  p-6 bg-white rounded-lg">
       <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleRegister} className="space-y-4">
