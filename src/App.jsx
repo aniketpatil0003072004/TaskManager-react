@@ -268,7 +268,7 @@ function TodoList() {
         if (Notification.permission === 'granted') {
           new Notification('Task Reminder', {
             body: `Reminder: ${task.title} is due at ${new Date(task.dueDate).toLocaleTimeString()}`,
-            icon: '/icon.png', 
+            icon: '/icon.ico', 
           });
         }
       }, delay);
