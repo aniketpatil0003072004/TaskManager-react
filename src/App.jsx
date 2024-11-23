@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createBrowserRouter, BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Link, useNavigate, RouterProvider } from 'react-router-dom'
 import { initializeApp } from 'firebase/app'
 import { 
   getAuth, 
@@ -20,6 +20,7 @@ import {
   where
 } from 'firebase/firestore'
 import { LoadingSpinner } from './components/LoadingSpinner'
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBEu8-1_hPMkBO7u0iOLRfCOhDc1Di2Tls",
@@ -252,7 +253,6 @@ function TodoList() {
   }, []);
 
   const scheduleNotification = (task) => {
-    // Ensure dueDate is in a valid format for Date parsing
     const now = new Date().getTime();
     const taskTime = new Date(task.dueDate).getTime();
   
@@ -260,7 +260,7 @@ function TodoList() {
     console.log('Task Time:', taskTime);
   
     if (!isNaN(taskTime) && taskTime > now) {
-      const delay = taskTime - now; // Calculate delay in milliseconds
+      const delay = taskTime - now; 
       console.log('Delay (ms):', delay);
   
       setTimeout(() => {
@@ -268,7 +268,7 @@ function TodoList() {
         if (Notification.permission === 'granted') {
           new Notification('Task Reminder', {
             body: `Reminder: ${task.title} is due at ${new Date(task.dueDate).toLocaleTimeString()}`,
-            icon: '/icon.png', // Optional: path to an icon for the notification
+            icon: '/icon.png', 
           });
         }
       }, delay);
@@ -353,6 +353,8 @@ console.log(scheduledTaskIds);
     }
   }
 
+
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-xl sm:text-3xl font-bold text-center mb-8">Welcome to Your To-Do List</h1>
@@ -384,6 +386,7 @@ console.log(scheduledTaskIds);
         <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
           Add Task
         </button>
+       
       </form>
       <div className="space-y-4">
         {tasks.map(task => (
@@ -405,6 +408,8 @@ console.log(scheduledTaskIds);
             >
               Delete
             </button>
+
+            
           </div>
         ))}
       </div>
@@ -415,12 +420,18 @@ console.log(scheduledTaskIds);
 function Calendar() {
   const [tasks, setTasks] = useState([])
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
   useEffect(() => {
     loadTasks()
+    const handleResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const loadTasks = async () => {
+    const auth = getAuth()
+    const db = getFirestore()
     const user = auth.currentUser
     if (!user) return
 
@@ -434,15 +445,11 @@ function Calendar() {
   }
 
   const getDaysInMonth = (date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    return new Date(year, month + 1, 0).getDate()
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
   }
 
   const getFirstDayOfMonth = (date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    return new Date(year, month, 1).getDay()
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay()
   }
 
   const renderCalendar = () => {
@@ -451,7 +458,7 @@ function Calendar() {
 
     const days = []
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-16 border"></div>)
+      days.push(<div key={`empty-${i}`} className="h-24 sm:h-32 md:h-40 border"></div>)
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -462,10 +469,10 @@ function Calendar() {
       })
 
       days.push(
-        <div key={day} className="h-16 border p-1">
+        <div key={day} className="h-24 sm:h-32 md:h-40 border p-1 overflow-y-auto">
           <div className="font-bold">{day}</div>
           {dayTasks.map(task => (
-            <div key={task.id} className="text-sm bg-green-100 rounded px-1 my-1">
+            <div key={task.id} className="text-xs sm:text-sm bg-green-100 rounded px-1 my-1 truncate">
               {task.title}
             </div>
           ))}
@@ -480,30 +487,34 @@ function Calendar() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + offset, 1))
   }
 
+  const isSmallScreen = windowWidth < 640 // Tailwind's sm breakpoint
+
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
       <h1 className="text-xl sm:text-3xl font-bold text-center mb-8">Your Calendar</h1>
       <Navigation />
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => changeMonth(-1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="px-2 sm:px-4 py-1 sm:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base"
         >
           Previous
         </button>
-        <h2 className="text-lg font-bold">
+        <h2 className="text-base sm:text-lg font-bold">
           {currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}
         </h2>
         <button
           onClick={() => changeMonth(1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="px-2 sm:px-4 py-1 sm:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base"
         >
           Next
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="font-bold text-center">{day}</div>
+          <div key={day} className="font-bold text-center text-xs sm:text-sm">
+            {isSmallScreen ? day.charAt(0) : day}
+          </div>
         ))}
         {renderCalendar()}
       </div>
